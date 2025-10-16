@@ -39,7 +39,7 @@
       <div class="poems-grid">
         <div v-for="poem in featuredPoems" :key="poem.id" class="poem-card">
           <h3 class="poem-title">{{ poem.title }}</h3>
-          <p class="poem-author">{{ poem.author_name }} · {{ poem.dynasty }}</p>
+          <p class="poem-author">{{ poem.authors?.name || poem.author_name || '未知作者' }} · {{ poem.dynasty }}</p>
           <p class="poem-content">{{ poem.content.substring(0, 100) }}...</p>
           <div class="poem-actions">
             <button @click="viewPoem(poem.id)" class="btn btn-secondary">查看详情</button>
@@ -124,7 +124,7 @@ export default {
     })
 
     const viewPoem = (poemId) => {
-      window.location.href = `/poems?id=${poemId}`
+      window.location.href = `/poems/${poemId}`
     }
 
     const toggleFavorite = (poem) => {

@@ -65,7 +65,7 @@
     <div v-else class="poems-grid">
       <div v-for="poem in poems" :key="poem.id" class="poem-card">
         <h3 class="poem-title">{{ poem.title }}</h3>
-        <p class="poem-author">{{ poem.author }} · {{ poem.dynasty }}</p>
+        <p class="poem-author">{{ poem.authors?.name || poem.author_name || '未知作者' }} · {{ poem.dynasty }}</p>
         <div class="poem-content">{{ poem.content }}</div>
         <div class="poem-actions">
           <button @click="viewPoemDetail(poem.id)" class="btn">查看详情</button>
