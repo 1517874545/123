@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS authors (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
-    dynasty VARCHAR(50) NOT NULL,
+    dynasty VARCHAR(100) NOT NULL,
     description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
+    color VARCHAR(7),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
