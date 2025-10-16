@@ -204,6 +204,7 @@ export default {
 
     return {
       showAddForm,
+      authorsStore,
       authors: paginatedAuthors,
       newAuthor,
       loading,

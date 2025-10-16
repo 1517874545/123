@@ -216,6 +216,7 @@ export default {
 
     return {
       showAddForm,
+      categoriesStore,
       categories: paginatedCategories,
       newCategory,
       colorOptions,
