@@ -146,72 +146,120 @@ export default {
 
 <style scoped>
 .poems {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
+  animation: fadeInUp 0.8s ease-out;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+  border-radius: 16px;
+  border-left: 5px solid #c62f2f;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .page-header h1 {
   color: #2c3e50;
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin: 0;
+  background: linear-gradient(45deg, #c62f2f, #2c5aa0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .add-form {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  border: 2px solid rgba(198, 47, 47, 0.1);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
 .add-form h3 {
-  margin-bottom: 1rem;
-  color: #2c3e50;
+  margin-bottom: 2rem;
+  color: #c62f2f;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 2px solid #e8f4f8;
+  padding-bottom: 1rem;
 }
 
 .form-actions {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
 }
 
 .poems-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
 }
 
 .poem-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 1.5rem;
-  transition: transform 0.3s, box-shadow 0.3s;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 2rem;
+  transition: all 0.4s ease;
+  border: 1px solid rgba(198, 47, 47, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.poem-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #c62f2f 0%, #2c5aa0 100%);
 }
 
 .poem-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
 .poem-title {
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
+  color: #c62f2f;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .poem-author {
-  color: #666;
-  margin-bottom: 1rem;
+  color: #2c5aa0;
+  margin-bottom: 1.5rem;
   font-style: italic;
+  font-weight: 500;
+  font-size: 1.1rem;
+  border-left: 3px solid #d4af37;
+  padding-left: 1rem;
 }
 
 .poem-content {
   white-space: pre-line;
-  line-height: 1.8;
-  margin-bottom: 1rem;
-  color: #333;
-  font-size: 1.1rem;
+  line-height: 2;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 400;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid #4a7c59;
 }
 
 .poem-actions {
@@ -221,22 +269,60 @@ export default {
 
 .empty-state {
   text-align: center;
-  padding: 3rem;
+  padding: 4rem 2rem;
   color: #666;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+  border-radius: 16px;
+  margin: 2rem 0;
+  border: 2px dashed #c62f2f;
+}
+
+.empty-state p {
+  font-size: 1.2rem;
+  color: #2c5aa0;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
   }
   
   .poems-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   
   .form-actions {
     flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .poem-card {
+    padding: 1.5rem;
+  }
+  
+  .poem-content {
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>
