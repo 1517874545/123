@@ -1,31 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { PoemService } from '../services/poemService.js'
 
 export const usePoemsStore = defineStore('poems', () => {
   // State
-  const poems = ref([
-    {
-      id: 1,
-      title: '静夜思',
-      author: '李白',
-      dynasty: '唐',
-      content: '床前明月光，疑是地上霜。\n举头望明月，低头思故乡。',
-      tags: ['思乡', '月夜'],
-      createdAt: new Date('2024-01-01')
-    },
-    {
-      id: 2,
-      title: '春晓',
-      author: '孟浩然',
-      dynasty: '唐',
-      content: '春眠不觉晓，处处闻啼鸟。\n夜来风雨声，花落知多少。',
-      tags: ['春天', '自然'],
-      createdAt: new Date('2024-01-02')
-    }
-  ])
-
+  const poems = ref([])
   const searchQuery = ref('')
   const selectedDynasty = ref('')
+  const loading = ref(false)
+  const error = ref(null)
 
   // Getters
   const filteredPoems = computed(() => {
@@ -35,7 +18,7 @@ export const usePoemsStore = defineStore('poems', () => {
       const query = searchQuery.value.toLowerCase()
       result = result.filter(poem => 
         poem.title.toLowerCase().includes(query) ||
-        poem.author.toLowerCase().includes(query) ||
+        poem.authors?.name.toLowerCase().includes(query) ||
         poem.content.toLowerCase().includes(query)
       )
     }
@@ -55,23 +38,95 @@ export const usePoemsStore = defineStore('poems', () => {
   const totalPoems = computed(() => poems.value.length)
 
   // Actions
-  const addPoem = (poemData) => {
-    const newPoem = {
-      id: Date.now(),
-      ...poemData,
-      createdAt: new Date()
+  const fetchPoems = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const data = await PoemService.getAllPoems()
+      poems.value = data || []
+    } catch (err) {
+      error.value = err.message
+      console.error('获取诗词失败:', err)
+    } finally {
+      loading.value = false
     }
-    poems.value.push(newPoem)
-    return newPoem
   }
 
-  const deletePoem = (id) => {
-    const index = poems.value.findIndex(poem => poem.id === id)
-    if (index !== -1) {
-      poems.value.splice(index, 1)
+  const addPoem = async (poemData) => {
+    loading.value = true
+    error.value = null
+    try {
+      const processedData = {
+        title: poemData.title,
+        author_name: poemData.author,
+        dynasty: poemData.dynasty,
+        content: poemData.content,
+        category_id: poemData.category_id,
+        tags: poemData.tags || []
+      }
+
+      await PoemService.addPoem(processedData)
+      await fetchPoems() // 重新获取数据
       return true
+    } catch (err) {
+      error.value = err.message
+      console.error('添加诗词失败:', err)
+      return false
+    } finally {
+      loading.value = false
     }
-    return false
+  }
+
+  const deletePoem = async (id) => {
+    loading.value = true
+    error.value = null
+    try {
+      await PoemService.deletePoem(id)
+      await fetchPoems() // 重新获取数据
+      return true
+    } catch (err) {
+      error.value = err.message
+      console.error('删除诗词失败:', err)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const searchPoems = async (query) => {
+    loading.value = true
+    error.value = null
+    try {
+      if (query.trim()) {
+        const data = await PoemService.searchPoems(query)
+        poems.value = data || []
+      } else {
+        await fetchPoems() // 如果搜索为空，显示所有诗词
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('搜索诗词失败:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const filterByDynasty = async (dynasty) => {
+    loading.value = true
+    error.value = null
+    try {
+      if (dynasty) {
+        const data = await PoemService.getPoemsByDynasty(dynasty)
+        poems.value = data || []
+      } else {
+        await fetchPoems() // 如果朝代为空，显示所有诗词
+      }
+    } catch (err) {
+      error.value = err.message
+      console.error('按朝代筛选失败:', err)
+    } finally {
+      loading.value = false
+    }
   }
 
   const setSearchQuery = (query) => {
@@ -81,17 +136,23 @@ export const usePoemsStore = defineStore('poems', () => {
   const clearFilters = () => {
     searchQuery.value = ''
     selectedDynasty.value = ''
+    fetchPoems() // 重新获取所有数据
   }
 
   return {
     poems,
     searchQuery,
     selectedDynasty,
+    loading,
+    error,
     filteredPoems,
     dynasties,
     totalPoems,
+    fetchPoems,
     addPoem,
     deletePoem,
+    searchPoems,
+    filterByDynasty,
     setSearchQuery,
     clearFilters
   }

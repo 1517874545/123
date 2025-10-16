@@ -12,7 +12,7 @@
       <h3>添加新诗词</h3>
       <form @submit.prevent="addPoem">
         <div class="form-group">
-          <label class="form-label">title:</label>
+          <label class="form-label">标题:</label>
           <input 
             v-model="newPoem.title" 
             type="text" 
@@ -48,53 +48,49 @@
           ></textarea>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn">添加</button>
+          <button type="submit" class="btn" :disabled="loading">
+            {{ loading ? '添加中...' : '添加' }}
+          </button>
           <button type="button" @click="resetForm" class="btn btn-secondary">重置</button>
         </div>
       </form>
     </div>
 
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-state">
+      <p>加载中...</p>
+    </div>
+
     <!-- 诗词列表 -->
-    <div class="poems-grid">
+    <div v-else class="poems-grid">
       <div v-for="poem in poems" :key="poem.id" class="poem-card">
         <h3 class="poem-title">{{ poem.title }}</h3>
         <p class="poem-author">{{ poem.author }} · {{ poem.dynasty }}</p>
         <div class="poem-content">{{ poem.content }}</div>
         <div class="poem-actions">
-          <button @click="deletePoem(poem.id)" class="btn btn-secondary">删除</button>
+          <button @click="deletePoem(poem.id)" class="btn btn-secondary" :disabled="loading">
+            {{ loading ? '删除中...' : '删除' }}
+          </button>
         </div>
       </div>
     </div>
 
-    <div v-if="poems.length === 0" class="empty-state">
+    <div v-if="!loading && poems.length === 0" class="empty-state">
       <p>暂无诗词，点击上方按钮添加第一首诗词吧！</p>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { usePoemsStore } from '../stores/poems'
 
 export default {
   name: 'Poems',
   setup() {
+    const poemStore = usePoemsStore()
     const showAddForm = ref(false)
-    const poems = ref([
-      {
-        id: 1,
-        title: '静夜思',
-        author: '李白',
-        dynasty: '唐',
-        content: '床前明月光，疑是地上霜。\n举头望明月，低头思故乡。'
-      },
-      {
-        id: 2,
-        title: '春晓',
-        author: '孟浩然',
-        dynasty: '唐',
-        content: '春眠不觉晓，处处闻啼鸟。\n夜来风雨声，花落知多少。'
-      }
-    ])
+    const loading = ref(false)
 
     const newPoem = reactive({
       title: '',
@@ -103,24 +99,41 @@ export default {
       content: ''
     })
 
-    const addPoem = () => {
-      const poem = {
-        id: Date.now(),
-        title: newPoem.title,
-        author: newPoem.author,
-        dynasty: newPoem.dynasty,
-        content: newPoem.content
+    onMounted(async () => {
+      loading.value = true
+      await poemStore.fetchPoems()
+      loading.value = false
+    })
+
+    const addPoem = async () => {
+      if (!newPoem.title || !newPoem.author || !newPoem.dynasty || !newPoem.content) {
+        alert('请填写所有字段')
+        return
       }
-      poems.value.push(poem)
-      resetForm()
-      showAddForm.value = false
+
+      loading.value = true
+      try {
+        await poemStore.addPoem(newPoem)
+        resetForm()
+        showAddForm.value = false
+      } catch (error) {
+        console.error('添加诗词失败:', error)
+        alert('添加诗词失败，请重试')
+      } finally {
+        loading.value = false
+      }
     }
 
-    const deletePoem = (id) => {
+    const deletePoem = async (id) => {
       if (confirm('确定要删除这首诗词吗？')) {
-        const index = poems.value.findIndex(poem => poem.id === id)
-        if (index > -1) {
-          poems.value.splice(index, 1)
+        loading.value = true
+        try {
+          await poemStore.deletePoem(id)
+        } catch (error) {
+          console.error('删除诗词失败:', error)
+          alert('删除诗词失败，请重试')
+        } finally {
+          loading.value = false
         }
       }
     }
@@ -134,8 +147,9 @@ export default {
 
     return {
       showAddForm,
-      poems,
+      poems: poemStore.poems,
       newPoem,
+      loading,
       addPoem,
       deletePoem,
       resetForm
@@ -197,6 +211,13 @@ export default {
   gap: 1.5rem;
   justify-content: center;
   margin-top: 2rem;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #2c5aa0;
+  font-size: 1.2rem;
 }
 
 .poems-grid {
