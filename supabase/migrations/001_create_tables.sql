@@ -99,6 +99,6 @@ INSERT INTO poems (title, content, author_id, category_id, dynasty, tags) VALUES
  (SELECT id FROM categories WHERE name = '宋词'),
  '宋', '{"月亮", "思念"}');
 
--- 创建用于搜索的全文搜索索引
-CREATE INDEX IF NOT EXISTS idx_poems_content_search ON poems USING gin(to_tsvector('chinese', content));
-CREATE INDEX IF NOT EXISTS idx_poems_title_search ON poems USING gin(to_tsvector('chinese', title));
+-- 创建用于搜索的全文搜索索引（使用英语配置，Supabase不支持中文配置）
+CREATE INDEX IF NOT EXISTS idx_poems_content_search ON poems USING gin(to_tsvector('english', content));
+CREATE INDEX IF NOT EXISTS idx_poems_title_search ON poems USING gin(to_tsvector('english', title));
