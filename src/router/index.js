@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Poems from '../views/Poems.vue'
 import About from '../views/About.vue'
+import Authors from '../views/Authors.vue'
+import Categories from '../views/Categories.vue'
 
 const routes = [
   {
@@ -26,6 +28,22 @@ const routes = [
     component: About,
     meta: {
       title: '关于'
+    }
+  },
+  {
+    path: '/authors',
+    name: 'Authors',
+    component: Authors,
+    meta: {
+      title: '作者管理'
+    }
+  },
+  {
+    path: '/categories',
+    name: 'Categories',
+    component: Categories,
+    meta: {
+      title: '分类管理'
     }
   }
 ]

@@ -6,29 +6,143 @@
       <router-link to="/poems" class="btn btn-primary">开始浏览</router-link>
     </div>
     
+    <!-- 数据统计 -->
+    <div class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📚</div>
+          <div class="stat-content">
+            <h3>{{ poemsCount }}</h3>
+            <p>诗词总数</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👤</div>
+          <div class="stat-content">
+            <h3>{{ authorsCount }}</h3>
+            <p>作者数量</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏷️</div>
+          <div class="stat-content">
+            <h3>{{ categoriesCount }}</h3>
+            <p>分类数量</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 热门诗词 -->
+    <div class="featured-section">
+      <h2 class="section-title">热门诗词</h2>
+      <div class="poems-grid">
+        <div v-for="poem in featuredPoems" :key="poem.id" class="poem-card">
+          <h3 class="poem-title">{{ poem.title }}</h3>
+          <p class="poem-author">{{ poem.author_name }} · {{ poem.dynasty }}</p>
+          <p class="poem-content">{{ poem.content.substring(0, 100) }}...</p>
+          <div class="poem-actions">
+            <button @click="viewPoem(poem.id)" class="btn btn-secondary">查看详情</button>
+            <button @click="toggleFavorite(poem)" class="btn" :class="{ 'btn-favorite': poem.is_favorite }">
+              {{ poem.is_favorite ? '已收藏' : '收藏' }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="view-all">
+        <router-link to="/poems" class="btn btn-outline">查看全部诗词</router-link>
+      </div>
+    </div>
+    
+    <!-- 功能特色 -->
     <div class="features-section">
       <h2 class="section-title">功能特色</h2>
       <div class="features-grid">
-        <div class="feature-card">
+        <router-link to="/poems" class="feature-card">
+          <div class="feature-icon">📖</div>
           <h3>诗词收藏</h3>
-          <p>收藏您喜爱的诗词作品</p>
-        </div>
-        <div class="feature-card">
+          <p>收藏您喜爱的诗词作品，建立个人诗词库</p>
+        </router-link>
+        <router-link to="/authors" class="feature-card">
+          <div class="feature-icon">👥</div>
           <h3>作者信息</h3>
           <p>了解诗人的生平和创作背景</p>
-        </div>
-        <div class="feature-card">
+        </router-link>
+        <router-link to="/categories" class="feature-card">
+          <div class="feature-icon">🏷️</div>
           <h3>分类管理</h3>
           <p>按朝代、体裁等方式分类管理</p>
-        </div>
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
+import { usePoemsStore } from '../stores/poems'
+import { useAuthorsStore } from '../stores/authors'
+import { useCategoriesStore } from '../stores/categories'
+
 export default {
-  name: 'Home'
+  name: 'Home',
+  setup() {
+    const poemsStore = usePoemsStore()
+    const authorsStore = useAuthorsStore()
+    const categoriesStore = useCategoriesStore()
+    
+    const poemsCount = ref(0)
+    const authorsCount = ref(0)
+    const categoriesCount = ref(0)
+    const featuredPoems = ref([])
+    const loading = ref(false)
+
+    onMounted(async () => {
+      loading.value = true
+      try {
+        // 获取统计数据
+        await Promise.all([
+          poemsStore.fetchPoems(),
+          authorsStore.fetchAuthors(),
+          categoriesStore.fetchCategories()
+        ])
+        
+        poemsCount.value = poemsStore.poems.length
+        authorsCount.value = authorsStore.authors.length
+        categoriesCount.value = categoriesStore.categories.length
+        
+        // 获取热门诗词（前6首）
+        featuredPoems.value = poemsStore.poems.slice(0, 6).map(poem => ({
+          ...poem,
+          is_favorite: false
+        }))
+      } catch (error) {
+        console.error('加载数据失败:', error)
+      } finally {
+        loading.value = false
+      }
+    })
+
+    const viewPoem = (poemId) => {
+      window.location.href = `/poems?id=${poemId}`
+    }
+
+    const toggleFavorite = (poem) => {
+      poem.is_favorite = !poem.is_favorite
+      // 这里可以添加收藏功能的实际实现
+      console.log('收藏状态变更:', poem.title, poem.is_favorite)
+    }
+
+    return {
+      poemsCount,
+      authorsCount,
+      categoriesCount,
+      featuredPoems,
+      loading,
+      viewPoem,
+      toggleFavorite
+    }
+  }
 }
 </script>
 
@@ -104,6 +218,129 @@ export default {
   box-shadow: 0 12px 30px rgba(212, 175, 55, 0.4);
 }
 
+.stats-section {
+  margin: 4rem 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  border: 1px solid rgba(44, 90, 160, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.stat-icon {
+  font-size: 3rem;
+  opacity: 0.8;
+}
+
+.stat-content h3 {
+  font-size: 2.5rem;
+  color: #2c5aa0;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.stat-content p {
+  color: #666;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.featured-section {
+  margin: 4rem 0;
+  padding: 3rem 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+  border-radius: 20px;
+}
+
+.poems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 0 2rem;
+}
+
+.poem-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border-left: 4px solid #2c5aa0;
+}
+
+.poem-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.poem-title {
+  color: #2c5aa0;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.poem-author {
+  color: #c62f2f;
+  margin-bottom: 1rem;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.poem-content {
+  color: #2c3e50;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.poem-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.btn-favorite {
+  background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
+  color: #2c3e50;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #2c5aa0;
+  color: #2c5aa0;
+}
+
+.btn-outline:hover {
+  background: #2c5aa0;
+  color: white;
+}
+
+.view-all {
+  text-align: center;
+  margin-top: 2rem;
+}
+
 .features-section {
   margin-top: 4rem;
 }
@@ -146,6 +383,9 @@ export default {
   border: 1px solid rgba(198, 47, 47, 0.1);
   position: relative;
   overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
 .feature-card::before {
@@ -166,6 +406,14 @@ export default {
 .feature-card:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  text-decoration: none;
+  color: inherit;
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
 }
 
 .feature-card h3 {

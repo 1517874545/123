@@ -6,6 +6,8 @@
         <div class="nav-links">
           <router-link to="/" class="nav-link">首页</router-link>
           <router-link to="/poems" class="nav-link">诗词列表</router-link>
+          <router-link to="/authors" class="nav-link">作者管理</router-link>
+          <router-link to="/categories" class="nav-link">分类管理</router-link>
           <router-link to="/about" class="nav-link">关于</router-link>
         </div>
       </div>
