@@ -68,7 +68,8 @@
         <p class="poem-author">{{ poem.author }} · {{ poem.dynasty }}</p>
         <div class="poem-content">{{ poem.content }}</div>
         <div class="poem-actions">
-          <button @click="deletePoem(poem.id)" class="btn btn-secondary" :disabled="loading">
+          <button @click="viewPoemDetail(poem.id)" class="btn">查看详情</button>
+          <button @click="deletePoem(poem.id)" class="btn btn-danger" :disabled="loading">
             {{ loading ? '删除中...' : '删除' }}
           </button>
         </div>
@@ -108,11 +109,13 @@
 
 <script>
 import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePoemsStore } from '../stores/poems'
 
 export default {
   name: 'Poems',
   setup() {
+    const router = useRouter()
     const poemStore = usePoemsStore()
     const showAddForm = ref(false)
     const loading = ref(false)
@@ -178,6 +181,10 @@ export default {
       } finally {
         loading.value = false
       }
+    }
+
+    const viewPoemDetail = (id) => {
+      router.push(`/poems/${id}`)
     }
 
     const deletePoem = async (id) => {

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Poems from '../views/Poems.vue'
+import PoemDetail from '../views/PoemDetail.vue'
 import About from '../views/About.vue'
 import Authors from '../views/Authors.vue'
 import Categories from '../views/Categories.vue'
@@ -44,6 +45,14 @@ const routes = [
     component: Categories,
     meta: {
       title: '分类管理'
+    }
+  },
+  {
+    path: '/poems/:id',
+    name: 'PoemDetail',
+    component: PoemDetail,
+    meta: {
+      title: '诗词详情'
     }
   }
 ]
