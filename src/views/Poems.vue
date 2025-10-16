@@ -204,6 +204,7 @@ export default {
     return {
       showAddForm,
       poems: paginatedPoems,
+      poemStore,
       newPoem,
       loading,
       currentPage,
