@@ -10,10 +10,10 @@
     <div class="poem-content">
       <div class="poem-meta">
         <div class="author-info">
-          <div class="author-avatar">{{ poem.author_name?.charAt(0) || '作' }}</div>
+          <div class="author-avatar">{{ poem.authors?.name?.charAt(0) || poem.author_name?.charAt(0) || '作' }}</div>
           <div class="author-details">
-            <h3 class="author-name">{{ poem.author_name }}</h3>
-            <p class="author-dynasty">{{ poem.dynasty }}</p>
+            <h3 class="author-name">{{ poem.authors?.name || poem.author_name || '未知作者' }}</h3>
+            <p class="author-dynasty">{{ poem.authors?.dynasty || poem.dynasty || '未知朝代' }}</p>
           </div>
         </div>
         <div class="poem-stats">
@@ -56,7 +56,7 @@
           @click="viewPoem(related.id)"
         >
           <h4>{{ related.title }}</h4>
-          <p>{{ related.author_name }} · {{ related.dynasty }}</p>
+          <p>{{ related.authors?.name || related.author_name || '未知作者' }} · {{ related.authors?.dynasty || related.dynasty || '未知朝代' }}</p>
         </div>
       </div>
     </div>
@@ -93,39 +93,32 @@ export default {
     const fetchPoemDetail = async (id) => {
       loading.value = true
       try {
-        // 首先尝试从store中获取诗词详情
-        const allPoems = poemStore.poems
-        poem.value = allPoems.find(p => p.id === parseInt(id))
-        
-        if (!poem.value) {
-          // 如果store中没有，从API获取详情
-          const poemData = await PoemService.getPoemById(id)
-          if (poemData) {
-            poem.value = {
-              ...poemData,
-              author_name: poemData.authors?.name,
-              dynasty: poemData.authors?.dynasty || poemData.dynasty
-            }
-          } else {
-            throw new Error('诗词不存在')
+        // 直接从API获取诗词详情
+        const poemData = await PoemService.getPoemById(id)
+        if (poemData) {
+          poem.value = {
+            ...poemData,
+            author_name: poemData.authors?.name || poemData.author_name,
+            dynasty: poemData.authors?.dynasty || poemData.dynasty
           }
-        }
-        
-        // 获取相关诗词（同一作者的其他作品）
-        const allPoemsData = await PoemService.getAllPoems()
-        relatedPoems.value = allPoemsData
-          .filter(p => {
-            const authorName = p.authors?.name || p.author_name
-            return authorName === poem.value.author_name && p.id !== poem.value.id
-          })
-          .slice(0, 3)
-          .map(p => ({
-            id: p.id,
-            title: p.title,
-            author_name: p.authors?.name || p.author_name,
-            dynasty: p.authors?.dynasty || p.dynasty
-          }))
           
+          // 获取相关诗词（同一作者的其他作品）
+          const allPoemsData = await PoemService.getAllPoems()
+          relatedPoems.value = allPoemsData
+            .filter(p => {
+              const authorName = p.authors?.name || p.author_name
+              return authorName === poem.value.author_name && p.id !== poem.value.id
+            })
+            .slice(0, 3)
+            .map(p => ({
+              id: p.id,
+              title: p.title,
+              author_name: p.authors?.name || p.author_name,
+              dynasty: p.authors?.dynasty || p.dynasty
+            }))
+        } else {
+          throw new Error('诗词不存在')
+        }
       } catch (error) {
         console.error('获取诗词详情失败:', error)
         alert('获取诗词详情失败：' + error.message)
