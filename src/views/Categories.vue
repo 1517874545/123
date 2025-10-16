@@ -80,14 +80,39 @@
       </div>
     </div>
 
-    <div v-if="!loading && categories.length === 0" class="empty-state">
+    <!-- 分页控件 -->
+    <div v-if="!loading && categoriesStore.categories.length > 0" class="pagination">
+      <div class="pagination-info">
+        显示 {{ Math.min((currentPage - 1) * itemsPerPage + 1, categoriesStore.categories.length) }}-{{ Math.min(currentPage * itemsPerPage, categoriesStore.categories.length) }} 条，共 {{ categoriesStore.categories.length }} 条
+      </div>
+      <div class="pagination-controls">
+        <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">
+          上一页
+        </button>
+        <div class="pagination-pages">
+          <button 
+            v-for="page in totalPages" 
+            :key="page"
+            @click="goToPage(page)"
+            :class="['pagination-page', { active: page === currentPage }]"
+          >
+            {{ page }}
+          </button>
+        </div>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn">
+          下一页
+        </button>
+      </div>
+    </div>
+
+    <div v-if="!loading && categoriesStore.categories.length === 0" class="empty-state">
       <p>暂无分类信息，点击上方按钮添加第一个分类吧！</p>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useCategoriesStore } from '../stores/categories'
 
 export default {
@@ -96,6 +121,8 @@ export default {
     const categoriesStore = useCategoriesStore()
     const showAddForm = ref(false)
     const loading = ref(false)
+    const currentPage = ref(1)
+    const itemsPerPage = ref(6)
 
     const colorOptions = [
       '#2c5aa0', '#4a7c59', '#d4af37', '#c62f2f', 
@@ -108,11 +135,40 @@ export default {
       color: colorOptions[0]
     })
 
+    // 分页计算属性
+    const totalPages = computed(() => {
+      return Math.ceil(categoriesStore.categories.length / itemsPerPage.value)
+    })
+
+    const paginatedCategories = computed(() => {
+      const startIndex = (currentPage.value - 1) * itemsPerPage.value
+      const endIndex = startIndex + itemsPerPage.value
+      return categoriesStore.categories.slice(startIndex, endIndex)
+    })
+
     onMounted(async () => {
       loading.value = true
       await categoriesStore.fetchCategories()
       loading.value = false
     })
+
+    const goToPage = (page) => {
+      if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page
+      }
+    }
+
+    const nextPage = () => {
+      if (currentPage.value < totalPages.value) {
+        currentPage.value++
+      }
+    }
+
+    const prevPage = () => {
+      if (currentPage.value > 1) {
+        currentPage.value--
+      }
+    }
 
     const addCategory = async () => {
       if (!newCategory.name || !newCategory.description) {
@@ -160,14 +216,20 @@ export default {
 
     return {
       showAddForm,
-      categories: categoriesStore.categories,
+      categories: paginatedCategories,
       newCategory,
       colorOptions,
       loading,
+      currentPage,
+      totalPages,
+      itemsPerPage,
       addCategory,
       deleteCategory,
       viewCategoryPoems,
-      resetForm
+      resetForm,
+      goToPage,
+      nextPage,
+      prevPage
     }
   }
 }
@@ -366,6 +428,101 @@ export default {
   font-size: 1.2rem;
   color: #2c5aa0;
   font-weight: 500;
+}
+
+/* 分页样式 */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(44, 90, 160, 0.1);
+}
+
+.pagination-info {
+  color: #2c5aa0;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination-btn {
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #2c5aa0;
+  background: transparent;
+  color: #2c5aa0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #2c5aa0;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination-page {
+  padding: 0.8rem 1.2rem;
+  border: 2px solid #d4af37;
+  background: transparent;
+  color: #2c3e50;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.pagination-page:hover {
+  background: #d4af37;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.pagination-page.active {
+  background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
+  color: white;
+  border-color: #d4af37;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .pagination-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .pagination-pages {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
