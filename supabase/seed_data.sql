@@ -19,16 +19,34 @@ INSERT INTO authors (name, dynasty, description) VALUES
 ('王昌龄', '唐代', '唐代著名边塞诗人。'),
 ('李绅', '唐代', '唐代诗人，新乐府运动参与者。');
 
--- 添加分类
-INSERT INTO categories (name, description, color) VALUES
-('唐诗', '唐代诗歌作品', '#2c5aa0'),
-('宋词', '宋代词作品', '#c62f2f'),
-('山水田园', '描写自然风光的诗歌', '#4a7c59'),
-('边塞诗', '描写边塞生活和战争的诗歌', '#d4af37'),
-('爱情诗', '描写爱情的诗歌', '#8e44ad'),
-('咏物诗', '描写物品的诗歌', '#16a085'),
-('送别诗', '送别友人的诗歌', '#e67e22'),
-('怀古诗', '怀念古代人事的诗歌', '#34495e');
+-- 更新现有分类的颜色信息
+UPDATE categories SET color = '#2c5aa0' WHERE name = '唐诗';
+UPDATE categories SET color = '#c62f2f' WHERE name = '宋词';
+
+-- 添加新的分类（避免重复插入）
+INSERT INTO categories (name, description, color) 
+SELECT '山水田园', '描写自然风光的诗歌', '#4a7c59'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '山水田园');
+
+INSERT INTO categories (name, description, color) 
+SELECT '边塞诗', '描写边塞生活和战争的诗歌', '#d4af37'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '边塞诗');
+
+INSERT INTO categories (name, description, color) 
+SELECT '爱情诗', '描写爱情的诗歌', '#8e44ad'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '爱情诗');
+
+INSERT INTO categories (name, description, color) 
+SELECT '咏物诗', '描写物品的诗歌', '#16a085'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '咏物诗');
+
+INSERT INTO categories (name, description, color) 
+SELECT '送别诗', '送别友人的诗歌', '#e67e22'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '送别诗');
+
+INSERT INTO categories (name, description, color) 
+SELECT '怀古诗', '怀念古代人事的诗歌', '#34495e'
+WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '怀古诗');
 
 -- 添加著名诗词
 INSERT INTO poems (title, content, author_id, category_id, dynasty, tags) VALUES
