@@ -80,6 +80,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePoemsStore } from '../stores/poems'
 import { useAuthorsStore } from '../stores/authors'
 import { useCategoriesStore } from '../stores/categories'
@@ -87,6 +88,7 @@ import { useCategoriesStore } from '../stores/categories'
 export default {
   name: 'Home',
   setup() {
+    const router = useRouter()
     const poemsStore = usePoemsStore()
     const authorsStore = useAuthorsStore()
     const categoriesStore = useCategoriesStore()
@@ -124,7 +126,7 @@ export default {
     })
 
     const viewPoem = (poemId) => {
-      window.location.href = `/poems/${poemId}`
+      router.push(`/poems/${poemId}`)
     }
 
     const toggleFavorite = (poem) => {
