@@ -106,11 +106,13 @@
 
 <script>
 import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthorsStore } from '../stores/authors'
 
 export default {
   name: 'Authors',
   setup() {
+    const router = useRouter()
     const authorsStore = useAuthorsStore()
     const showAddForm = ref(false)
     const loading = ref(false)
@@ -192,8 +194,8 @@ export default {
     }
 
     const viewAuthorPoems = (authorId) => {
-      // 跳转到诗词页面并筛选该作者的诗词
-      window.location.href = `/poems?author=${authorId}`
+      // 跳转到作者诗词列表页面
+      router.push(`/author-poems/${authorId}`)
     }
 
     const resetForm = () => {

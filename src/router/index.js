@@ -5,6 +5,7 @@ import PoemDetail from '../views/PoemDetail.vue'
 import About from '../views/About.vue'
 import Authors from '../views/Authors.vue'
 import Categories from '../views/Categories.vue'
+import AuthorPoems from '../views/AuthorPoems.vue'
 
 const routes = [
   {
@@ -53,6 +54,14 @@ const routes = [
     component: PoemDetail,
     meta: {
       title: '诗词详情'
+    }
+  },
+  {
+    path: '/author-poems/:id',
+    name: 'AuthorPoems',
+    component: AuthorPoems,
+    meta: {
+      title: '作者诗词'
     }
   }
 ]
