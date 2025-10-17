@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { supabase } from '../supabase'
+import { supabase } from '../config/supabase.js'
 
 export const useAuthorsStore = defineStore('authors', {
   state: () => ({
