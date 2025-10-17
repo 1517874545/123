@@ -53,7 +53,7 @@
           v-for="related in relatedPoems" 
           :key="related.id" 
           class="related-item"
-          @click="viewPoem(related.id)"
+          @click.stop="viewPoem(related.id)"
         >
           <h4>{{ related.title }}</h4>
           <p>{{ related.authors?.name || related.author_name || '未知作者' }} · {{ related.authors?.dynasty || related.dynasty || '未知朝代' }}</p>
@@ -148,8 +148,17 @@ export default {
     }
 
     const viewPoem = (id) => {
+      console.log('点击相关诗词，ID:', id)
       // 使用Vue Router的编程式导航，确保单页应用正常工作
       router.push(`/poems/${id}`)
+        .then(() => {
+          console.log('导航成功')
+        })
+        .catch(error => {
+          console.error('导航失败:', error)
+          // 如果导航失败，使用备用方案
+          window.location.href = `/poems/${id}`
+        })
     }
 
     onMounted(() => {
