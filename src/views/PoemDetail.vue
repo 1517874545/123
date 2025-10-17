@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePoemsStore } from '../stores/poems'
 import { PoemService } from '../services/poemService.js'
@@ -148,15 +148,21 @@ export default {
     }
 
     const viewPoem = (id) => {
-      // 使用完整的URL路径进行跳转
-      const baseUrl = window.location.origin
-      window.location.href = `${baseUrl}/poems/${id}`
+      // 使用Vue Router的编程式导航，确保单页应用正常工作
+      router.push(`/poems/${id}`)
     }
 
     onMounted(() => {
       const poemId = route.params.id
       if (poemId) {
         fetchPoemDetail(poemId)
+      }
+    })
+
+    // 监听路由参数变化，当诗词ID改变时重新加载数据
+    watch(() => route.params.id, (newId, oldId) => {
+      if (newId && newId !== oldId) {
+        fetchPoemDetail(newId)
       }
     })
 
