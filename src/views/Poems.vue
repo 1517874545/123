@@ -183,8 +183,8 @@ export default {
       }
     }
 
-    const viewPoemDetail = (id) => {
-      router.push(`/poems/${id}`)
+    const viewPoemDetail = (poemId) => {
+      router.push(`/poems/${poemId}`)
     }
 
     const deletePoem = async (id) => {
