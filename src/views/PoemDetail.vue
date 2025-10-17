@@ -148,7 +148,10 @@ export default {
     }
 
     const viewPoem = (id) => {
-      router.push(`/poems/${id}`)
+      // 使用replace而不是push，避免浏览器历史记录过多
+      router.replace(`/poems/${id}`)
+      // 重新加载页面以获取新诗词数据
+      window.location.reload()
     }
 
     onMounted(() => {
@@ -363,14 +366,21 @@ export default {
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
-  cursor: pointer;
+  cursor: pointer !important;
   transition: all 0.3s ease;
   border-left: 3px solid #d4af37;
+  position: relative;
+  z-index: 1;
 }
 
 .related-item:hover {
   transform: translateX(5px);
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+}
+
+.related-item:active {
+  transform: translateX(5px) scale(0.98);
 }
 
 .related-item h4 {
