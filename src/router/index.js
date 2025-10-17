@@ -6,6 +6,7 @@ import About from '../views/About.vue'
 import Authors from '../views/Authors.vue'
 import Categories from '../views/Categories.vue'
 import AuthorPoems from '../views/AuthorPoems.vue'
+import CategoryPoems from '../views/CategoryPoems.vue'
 
 const routes = [
   {
@@ -62,6 +63,14 @@ const routes = [
     component: AuthorPoems,
     meta: {
       title: '作者诗词'
+    }
+  },
+  {
+    path: '/category-poems/:id',
+    name: 'CategoryPoems',
+    component: CategoryPoems,
+    meta: {
+      title: '分类诗词'
     }
   }
 ]

@@ -113,11 +113,13 @@
 
 <script>
 import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCategoriesStore } from '../stores/categories'
 
 export default {
   name: 'Categories',
   setup() {
+    const router = useRouter()
     const categoriesStore = useCategoriesStore()
     const showAddForm = ref(false)
     const loading = ref(false)
@@ -204,8 +206,8 @@ export default {
     }
 
     const viewCategoryPoems = (categoryId) => {
-      // 跳转到诗词页面并筛选该分类的诗词
-      window.location.href = `/poems?category=${categoryId}`
+      // 跳转到分类诗词列表页面
+      router.push(`/category-poems/${categoryId}`)
     }
 
     const resetForm = () => {
