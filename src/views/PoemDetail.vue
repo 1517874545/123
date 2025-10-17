@@ -148,8 +148,9 @@ export default {
     }
 
     const viewPoem = (id) => {
-      // 直接使用页面跳转，确保完全刷新
-      window.location.href = `/poems/${id}`
+      // 使用完整的URL路径进行跳转
+      const baseUrl = window.location.origin
+      window.location.href = `${baseUrl}/poems/${id}`
     }
 
     onMounted(() => {
