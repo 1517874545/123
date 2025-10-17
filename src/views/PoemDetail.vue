@@ -148,10 +148,8 @@ export default {
     }
 
     const viewPoem = (id) => {
-      // 使用replace而不是push，避免浏览器历史记录过多
-      router.replace(`/poems/${id}`)
-      // 重新加载页面以获取新诗词数据
-      window.location.reload()
+      // 直接使用页面跳转，确保完全刷新
+      window.location.href = `/poems/${id}`
     }
 
     onMounted(() => {
