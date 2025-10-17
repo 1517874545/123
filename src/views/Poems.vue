@@ -183,8 +183,8 @@ export default {
       }
     }
 
-    const viewPoemDetail = (poemId) => {
-      router.push(`/poems/${poemId}`)
+    const viewPoemDetail = (id) => {
+      router.push(`/poems/${id}`)
     }
 
     const deletePoem = async (id) => {
@@ -218,6 +218,7 @@ export default {
       totalPages,
       itemsPerPage,
       addPoem,
+      viewPoemDetail,
       deletePoem,
       resetForm,
       goToPage,
