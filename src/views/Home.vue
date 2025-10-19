@@ -1,5 +1,7 @@
 <template>
   <div class="home">
+    <!-- AI聊天助手 -->
+    <AIChatAssistant />
     <div class="hero-section">
       <h1 class="hero-title">欢迎来到诗词管理系统</h1>
       <p class="hero-subtitle">探索中华诗词之美</p>
@@ -84,9 +86,13 @@ import { useRouter } from 'vue-router'
 import { usePoemsStore } from '../stores/poems'
 import { useAuthorsStore } from '../stores/authors'
 import { useCategoriesStore } from '../stores/categories'
+import AIChatAssistant from '../components/AIChatAssistant.vue'
 
 export default {
   name: 'Home',
+  components: {
+    AIChatAssistant
+  },
   setup() {
     const router = useRouter()
     const poemsStore = usePoemsStore()
